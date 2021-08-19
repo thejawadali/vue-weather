@@ -6,11 +6,10 @@
         <div class="temp-container">
           <h1 class="temperature">{{ Math.round(weatherData.main.temp) }}°c</h1>
           <div>
-            <div class="city">{{weatherData.name}}</div>
-            <div class="date">{{date}}</div>
+            <div class="city">{{ weatherData.name }}</div>
+            <div class="date">{{ date }}</div>
           </div>
           <div class="icon">
-            <!-- https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@4x.png -->
             <img
               :src="`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@4x.png`"
               alt="weather image"
@@ -22,33 +21,41 @@
       <div class="temp-details">
         <div class="search-box">
           <span class="material-icons">search</span>
-          <input type="text" placeholder="Search City" />
+          <input
+            type="text"
+            placeholder="Search City"
+            v-model="searchCity"
+            @keypress.enter="fetchData"
+          />
         </div>
         <h4>Weather Details</h4>
         <div class="details">
           <div class="item">
             <p class="key">Cloudy</p>
-            <p class="value">{{weatherData.clouds.all}}%</p>
+            <p><span class="value">{{ weatherData.clouds.all }}</span>%</p>
           </div>
           <div class="item">
             <p class="key">Humidity</p>
-            <p class="value">{{weatherData.main.humidity}}%</p>
+            <p><span class="value">{{ weatherData.main.humidity }}</span>%</p>
           </div>
           <div class="item">
             <p class="key">Wind</p>
-            <p class="value">{{Math.round(weatherData.wind.speed)}}m/s</p>
+            <p><span class="value">{{ Math.round(weatherData.wind.speed) }}</span>m/s</p>
           </div>
           <div class="item">
             <p class="key">Pressure</p>
-            <p class="value">{{weatherData.main.pressure}}hPa</p>
+            <p>
+              <span class="value">{{ weatherData.main.pressure }}</span
+              >hPa
+            </p>
           </div>
         </div>
       </div>
     </div>
     <div v-else class="loader">
-    <h1>{{ respMsg }}</h1>
-    <button v-if="respMsg !== 'Loading...'" @click="reload">Reload</button>
-  </div>
+      <h1>{{ respMsg }}</h1>
+      <button v-if="respMsg !== 'Loading...'" @click="reload">Reload</button>
+    </div>
   </div>
 </template>
 
@@ -75,7 +82,7 @@ function fetchData() {
         return;
       }
       console.log(data);
-      
+
       weatherData.value = data;
     });
 }
@@ -217,11 +224,16 @@ img {
   justify-content: space-between;
   margin: 1rem 0;
   font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.value {
+  font-weight: bold;
+  color: #eee;
 }
 .item .key {
   color: rgba(255, 255, 255, 0.5);
 }
-
 
 .loader {
   display: flex;
@@ -244,7 +256,6 @@ img {
   border: none;
   cursor: pointer;
 }
-
 @media screen and (min-width: 800px) {
   .container {
     flex-direction: row;
