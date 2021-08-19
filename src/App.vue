@@ -1,20 +1,21 @@
 <template>
   <div class="body">
-    <div class="container">
+    <div v-if="weatherData.main" class="container">
       <div class="c1">
         <h1 class="heading">Vue Weather</h1>
         <div class="temp-container">
-          <h1 class="temperature">34°c</h1>
+          <h1 class="temperature">{{ Math.round(weatherData.main.temp) }}°c</h1>
           <div>
-            <div class="city">Lahore</div>
-            <div class="date">Tuesday, 22 Oct 2021</div>
+            <div class="city">{{weatherData.name}}</div>
+            <div class="date">{{date}}</div>
           </div>
           <div class="icon">
+            <!-- https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@4x.png -->
             <img
-              src="https://openweathermap.org/img/wn/50d@4x.png"
+              :src="`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@4x.png`"
               alt="weather image"
             />
-            <p class="weather">Sunny</p>
+            <p class="weather">{{ weatherData.weather[0].main }}</p>
           </div>
         </div>
       </div>
@@ -27,20 +28,67 @@
         <div class="details">
           <div class="item">
             <p class="key">Cloudy</p>
-            <p class="value">40%</p>
+            <p class="value">{{weatherData.clouds.all}}%</p>
           </div>
           <div class="item">
-            <p class="key">Cloudy</p>
-            <p class="value">40%</p>
+            <p class="key">Humidity</p>
+            <p class="value">{{weatherData.main.humidity}}%</p>
+          </div>
+          <div class="item">
+            <p class="key">Wind</p>
+            <p class="value">{{Math.round(weatherData.wind.speed)}}m/s</p>
+          </div>
+          <div class="item">
+            <p class="key">Pressure</p>
+            <p class="value">{{weatherData.main.pressure}}hPa</p>
           </div>
         </div>
       </div>
     </div>
+    <div v-else class="loader">
+    <h1>{{ respMsg }}</h1>
+    <button v-if="respMsg !== 'Loading...'" @click="reload">Reload</button>
+  </div>
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
+import { onMounted, ref } from "@vue/runtime-core";
+import dayjs from "dayjs";
+
+const searchCity = ref("");
+const weatherData: any = ref("");
+const date = dayjs().format("dddd, MMMM D, YYYY");
+const respMsg = ref("Loading...");
+
+function fetchData() {
+  const q = searchCity.value ? searchCity.value : "Lahore";
+  fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=${q}&units=metric&appid=appID`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      searchCity.value = "";
+      if (data.cod == 404) {
+        respMsg.value = data.message;
+        weatherData.value = "";
+        return;
+      }
+      console.log(data);
+      
+      weatherData.value = data;
+    });
+}
+
+function reload() {
+  window.location.reload();
+}
+
+onMounted(() => {
+  fetchData();
+});
 </script>
+  
 
 <style>
 * {
@@ -78,18 +126,18 @@
   flex-direction: column;
   justify-content: center;
 }
-
+.c1 {
+  width: 100%;
+  height: 50%;
+}
 .temp-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-evenly;
+  height: 100%;
 }
-.c1 {
-  width: 100%;
-  height: 50%;
-  padding-top: 3rem;
-}
+
 .heading {
   display: none;
 }
@@ -105,7 +153,7 @@
   font-weight: 500;
 }
 .date {
-  font-size: 16px;
+  font-size: 14px;
   color: #666;
   text-align: center;
 }
@@ -174,6 +222,29 @@ img {
   color: rgba(255, 255, 255, 0.5);
 }
 
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.loader h1 {
+  color: #fff;
+  font-size: 3rem;
+  padding: 2rem;
+}
+.loader button:active {
+  background: #ddd;
+}
+.loader button {
+  font-size: 2rem;
+  padding: 0.5rem 0;
+  border-radius: 5px;
+  background: #eee;
+  border: none;
+  cursor: pointer;
+}
+
 @media screen and (min-width: 800px) {
   .container {
     flex-direction: row;
@@ -181,6 +252,7 @@ img {
   }
   .c1 {
     height: 100%;
+    padding-top: 3rem;
   }
   .temp-container {
     height: 100%;
