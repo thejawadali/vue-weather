@@ -71,7 +71,7 @@ const respMsg = ref("Loading...");
 function fetchData() {
   const q = searchCity.value ? searchCity.value : "Lahore";
   fetch(
-    `https://api.openweathermap.org/data/2.5/weather?q=${q}&units=metric&appid=appID`
+    `https://api.openweathermap.org/data/2.5/weather?q=${q}&units=metric&appid=04da414178ed3d4dccd95cca12d05f1d`
   )
     .then((response) => response.json())
     .then((data) => {

@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "dayjs": "^1.10.6",
+    "dotenv": "^10.0.0",
     "vue": "^3.0.5"
   },
   "devDependencies": {
